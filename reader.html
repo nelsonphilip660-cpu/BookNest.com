@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BookNest | Read your book</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body.reader-page{min-height:100vh;background:#f7f5f1;color:#26231f;padding:24px}
+    .reader-shell{max-width:900px;margin:30px auto;background:#fff;padding:clamp(20px,5vw,48px);border-radius:18px;box-shadow:0 12px 40px #30251a18}
+    .reader-shell h1{margin:8px 0 20px}.reader-toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .reader-toolbar button{cursor:pointer}.reader-status{min-height:1.5em;color:#625b53}
+    #pdfViewer{width:100%;height:min(76vh,900px);overflow:auto;border:1px solid #e6e0d8;border-radius:10px;background:#777;padding:18px;text-align:center}
+    .pdf-page{display:block;max-width:100%;height:auto;margin:0 auto 18px;box-shadow:0 2px 12px #0005;background:#fff}
+  </style>
+</head>
+<body class="reader-page">
+  <main class="reader-shell">
+    <a href="index.html#myBooks">← Back to My Books</a>
+    <h1 id="bookTitle">Read your book</h1>
+    <div class="reader-toolbar">
+      <button class="btn primary" id="playButton" type="button">🔊 Read aloud</button>
+      <button class="btn" id="pauseButton" type="button">Pause</button>
+      <button class="btn" id="stopButton" type="button">Stop</button>
+      <a class="btn" id="downloadLink" download>Download PDF ↓</a>
+    </div>
+    <p class="reader-status" id="readerStatus" aria-live="polite">Loading your book…</p>
+    <div id="pdfViewer" aria-label="PDF book pages"></div>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.hash.slice(1));
+      const url = params.get('pdf');
+      const title = params.get('title') || 'Read your book';
+      const status = document.getElementById('readerStatus');
+      const play = document.getElementById('playButton');
+      let chunks = [], index = 0, loading = false, reading = false;
+      document.title = `BookNest | ${title}`;
+      document.getElementById('bookTitle').textContent = title;
+      if (!url) { status.textContent = 'No book was provided. Return to My Books and open a book from your purchased library.'; play.disabled = true; return; }
+      const download = document.getElementById('downloadLink'); download.href = url;
+      if (!window.pdfjsLib) { status.textContent = 'The reading tools could not load. You can still view or download the PDF.'; play.disabled = true; return; }
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      async function loadText() {
+        if (chunks.length || loading) return;
+        loading = true;
+        try {
+          const pdf = await pdfjsLib.getDocument({url, withCredentials: false}).promise;
+          const viewer = document.getElementById('pdfViewer');
+          // Render every page into the reader so display does not depend on
+          // the browser's built-in PDF viewer or iframe permissions.
+          for (let p = 1; p <= pdf.numPages; p++) {
+            const page = await pdf.getPage(p);
+            const viewport = page.getViewport({scale: 1.25});
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-page';
+            canvas.title = `Click to read aloud from page ${p}`;
+            canvas.dataset.startChunk = String(chunks.length);
+            canvas.width = Math.ceil(viewport.width);
+            canvas.height = Math.ceil(viewport.height);
+            canvas.setAttribute('aria-label', `Page ${p}`);
+            viewer.appendChild(canvas);
+            await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+            const content = await page.getTextContent();
+            const text = content.items.map(item => item.str).join(' ').trim();
+            if (text) chunks.push(...(text.match(/[\s\S]{1,2500}(?:\s|$)/g) || [text]));
+            status.textContent = `Loading page ${p} of ${pdf.numPages}…`;
+          }
+          status.textContent = chunks.length ? `Ready to read · ${pdf.numPages} pages` : 'No selectable text found. Scanned PDFs need OCR; you can still view or download this PDF.';
+        } catch (err) { console.error(err); status.textContent = 'Could not display this PDF. The secure file may have expired or its storage server may block website viewing. Use Download PDF to open it directly.'; }
+        finally { loading = false; play.disabled = !chunks.length; }
+      }
+      function speakNext() {
+        if (!reading || index >= chunks.length) { reading = false; status.textContent = 'Finished reading.'; play.textContent = '🔊 Read aloud'; return; }
+        const utterance = new SpeechSynthesisUtterance(chunks[index++]);
+        utterance.onend = speakNext;
+        utterance.onerror = () => { status.textContent = 'Speech playback stopped.'; };
+        speechSynthesis.speak(utterance);
+      }
+      play.disabled = true; loadText();
+      play.addEventListener('click', () => { if (!('speechSynthesis' in window)) { status.textContent = 'Audio speech is unavailable in this browser.'; return; } if (speechSynthesis.paused) { speechSynthesis.resume(); return; } if (speechSynthesis.speaking) return; if (index >= chunks.length) index = 0; reading = true; play.textContent = 'Reading…'; speakNext(); });
+      document.getElementById('pdfViewer').addEventListener('click', event => {
+        const page = event.target.closest('.pdf-page');
+        if (!page || !('speechSynthesis' in window)) return;
+        const start = Number(page.dataset.startChunk);
+        if (!Number.isInteger(start) || start >= chunks.length) {
+          status.textContent = 'This page has no selectable text to read aloud.';
+          return;
+        }
+        speechSynthesis.cancel();
+        index = start;
+        reading = true;
+        status.textContent = `Reading from page ${page.getAttribute('aria-label').replace('Page ', '')}…`;
+        play.textContent = 'Reading…';
+        speakNext();
+      });
+      document.getElementById('pauseButton').addEventListener('click', () => speechSynthesis.pause());
+      document.getElementById('stopButton').addEventListener('click', () => { reading = false; speechSynthesis.cancel(); index = 0; play.textContent = '🔊 Read aloud'; status.textContent = 'Reading stopped.'; });
+      addEventListener('pagehide', () => speechSynthesis.cancel());
+    })();
+  </script>
+</body>
+</html>

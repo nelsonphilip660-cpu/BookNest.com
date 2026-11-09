@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BookNest - Discover books, stories, educational materials and history documents.">
+    <title>BookNest | Your Online Bookstore</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="loader" id="loader">
+        <div class="loader-book">B</div>
+        <h2>BookNest</h2>
+        <p>Opening your library...</p>
+    </div>
+
+    <header class="header">
+        <a href="index.html" class="logo">Book<span>Nest</span><small> YOUR ONLINE BOOKSTORE</small></a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+        <nav id="navigation">
+            <a href="#home">Home</a>
+            <a href="#categories">Categories</a>
+            <a href="#books">Books</a>
+            <a href="#myBooks">My Books</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☾</button>
+            <button class="cart-button" id="openCart">🛒 Cart <span id="cartCount">0</span></button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-content reveal">
+                <span class="eyebrow">WELCOME TO BOOKNEST</span>
+                <h1>Every Great Story Begins With <span>A Book.</span></h1>
+                <p>Discover educational books, inspiring stories, historical materials and useful documents all in one
+                    place.</p>
+
+                <div class="hero-buttons">
+                    <a href="#books" class="btn primary">Explore Books →</a>
+                    <a href="#categories" class="btn secondary">Browse Categories</a>
+                </div>
+
+                <div class="hero-note">📚 Read. Discover. Learn. Grow.</div>
+            </div>
+
+            <div class="hero-image reveal">
+                <img src="book.avif" alt="Beautiful library">
+                <div class="hero-card">
+                    <span>📖</span>
+                    <div>
+                        <strong>Your next favourite book</strong>
+                        <small>Is waiting for you</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="search-section">
+            <form id="searchForm">
+                <span>⌕</span>
+                <input type="search" id="searchInput" placeholder="Search books, authors, stories or documents..."
+                    aria-label="Search books">
+                <button class="btn primary">Search</button>
+            </form>
+        </section>
+
+        <section class="section" id="categories">
+            <div class="section-heading reveal">
+                <span class="eyebrow">FIND WHAT YOU LOVE</span>
+                <h2>Explore Categories</h2>
+                <p>Choose from our collection of learning and reading materials.</p>
+            </div>
+
+            <div class="category-grid">
+                <button class="category-card category-btn active" data-category="All">
+                    <span>📚</span><strong>All Books</strong><small>Explore everything</small>
+                </button>
+
+                <button class="category-card category-btn" data-category="Education">
+                    <span>🎓</span><strong>Education</strong><small>Academic materials</small>
+                </button>
+
+                <button class="category-card category-btn" data-category="Stories">
+                    <span>📖</span><strong>Stories & Novels</strong><small>Fiction and stories</small>
+                </button>
+
+                <button class="category-card category-btn" data-category="History">
+                    <span>🏛️</span><strong>History</strong><small>Explore the past</small>
+                </button>
+
+                <button class="category-card category-btn" data-category="Documents">
+                    <span>📄</span><strong>Documents</strong><small>Useful resources</small>
+                </button>
+
+                <button class="category-card category-btn" data-category="Business">
+                    <span>💼</span><strong>Business</strong><small>Business knowledge</small>
+                </button>
+            </div>
+        </section>
+
+        <section class="section books-section" id="books">
+            <div class="section-heading heading-row">
+                <div>
+                    <span class="eyebrow">OUR COLLECTION</span>
+                    <h2>Discover Books</h2>
+                    <p>Find your next reading adventure.</p>
+                </div>
+
+                <span class="book-count" id="bookCount">Loading...</span>
+            </div>
+
+            <!-- Books are loaded automatically from Supabase -->
+            <div class="book-grid" id="bookGrid"></div>
+
+            <p class="empty-message" id="catalogueStatus">
+                Connecting to the BookNest library...
+            </p>
+
+            <p class="empty-message" id="emptyMessage" hidden>
+                No materials found. Try another search.
+            </p>
+        </section>
+
+
+
+        <section class="section" id="myBooks">
+    <div class="section-heading">
+        <span class="eyebrow">YOUR DIGITAL LIBRARY</span>
+        <h2>My Purchased Books</h2>
+        <p>Enter your order reference and secure download code to access your purchased books after payment approval.</p>
+    </div>
+
+    <form id="downloadForm" class="checkout-form">
+        <input
+            type="text"
+            id="downloadOrderId"
+            placeholder="Enter your order reference"
+            required>
+
+        <input
+            type="password"
+            id="downloadToken"
+            placeholder="Enter your secure download code"
+            required>
+
+        <button type="submit" class="btn primary" id="downloadButton">
+            Access My Books →
+        </button>
+    </form>
+
+    <p id="downloadMessage" aria-live="polite"></p>
+
+    <div id="downloadResults"></div>
+</section>
+        <section class="about-section" id="about">
+            <div class="about-image">
+                <img src="book8.avif" alt="Bookshelves in a library">
+            </div>
+
+            <div class="about-content">
+                <span class="eyebrow">ABOUT BOOKNEST</span>
+                <h2>A Home for Every Curious Mind.</h2>
+                <p>BookNest is an online bookstore designed to make discovering educational materials, stories, history
+                    resources and useful documents easier.</p>
+                <p>Browse our collection, add your selections to the cart and contact us directly to arrange payment and
+                    delivery.</p>
+                <a href="#books" class="btn primary">Browse Our Collection</a>
+            </div>
+        </section>
+
+        <section class="contact-section" id="contact">
+            <span class="eyebrow">WE ARE HERE TO HELP</span>
+            <h2>Get in Touch</h2>
+            <p>Need help finding a book or placing an order? Contact BookNest.</p>
+
+            <div class="contact-cards">
+                <a href="mailto:nelsonphilip660@gmail.com" class="contact-card">
+                    <span>✉️</span>
+                    <strong>Email Us</strong>
+                    <small>nelsonphilip660@gmail.com</small>
+                </a>
+
+                <a href="https://wa.me/2349037141652" target="_blank" rel="noopener" class="contact-card">
+                    <span>💬</span>
+                    <strong>WhatsApp Us</strong>
+                    <small>Chat with BookNest</small>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-main">
+            <div>
+                <a href="#home" class="logo footer-logo">Book<span>Nest</span></a>
+                <p>Your online destination for books, stories, education and knowledge.</p>
+            </div>
+
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <a href="#home">Home</a>
+                <a href="#categories">Categories</a>
+                <a href="#books">Books</a>
+                <a href="#about">About Us</a>
+                <a href="#contact">Contact</a>
+            </div>
+
+            <div class="footer-links">
+                <h3>Contact</h3>
+                <a href="mailto:nelsonphilip660@gmail.com">Email BookNest</a>
+                <a href="https://wa.me/2349037141652" target="_blank" rel="noopener">WhatsApp BookNest</a>
+            </div>
+        </div>
+
+        <div class="social-floating">
+            <a href="https://wa.me/2349037141652" target="_blank" rel="noopener" aria-label="WhatsApp">W</a>
+            <a href="https://facebook.com/" target="_blank" rel="noopener" aria-label="Facebook">f</a>
+            <a href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">◎</a>
+            <a href="https://tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok">♪</a>
+            <a href="mailto:nelsonphilip660@gmail.com" aria-label="Email">✉</a>
+        </div>
+
+        <p class="copyright">© <span id="year"></span> BookNest. All rights reserved.</p>
+    </footer>
+
+    <button class="floating-cart" id="floatingCart" aria-label="Open shopping cart">
+        🛒 <span id="floatingCount">0</span>
+    </button>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <aside class="cart-panel" id="cartPanel">
+        <div class="cart-header">
+            <h2>Your Shopping Cart</h2>
+            <button id="closeCart" aria-label="Close cart">✕</button>
+        </div>
+
+        <div class="cart-items" id="cartItems">
+            <p class="empty-cart">Your cart is empty.</p>
+        </div>
+<!-- 
+        <div class="cart-footer">
+            <div class="total-row">
+                <strong>Total</strong>
+                <strong id="cartTotal">₦0</strong>
+            </div>
+
+            <button class="btn primary checkout-btn" id="checkoutBtn">
+                Order on WhatsApp →
+            </button>
+
+            <small>Payment instructions will be provided through WhatsApp.</small>
+        </div> -->
+
+
+        <div class="cart-footer">
+    <div class="total-row">
+        <strong>Total</strong>
+        <strong id="cartTotal">₦0</strong>
+    </div>
+
+    <form id="checkoutForm" class="checkout-form">
+        <h3>Customer Details</h3>
+
+        <input
+            type="text"
+            id="customerName"
+            placeholder="Your full name"
+            required
+            maxlength="100">
+
+        <input
+            type="tel"
+            id="customerPhone"
+            placeholder="Your WhatsApp phone number"
+            required
+            maxlength="20">
+
+        <input
+            type="email"
+            id="customerEmail"
+            placeholder="Your email address (optional)"
+            maxlength="150">
+
+        <button class="btn primary checkout-btn" id="placeOrderBtn" type="submit">
+            Place Order →
+        </button>
+    </form>
+
+    <div id="orderConfirmation" hidden>
+        <h3>Order Created Successfully!</h3>
+        <p>Your order reference:</p>
+        <strong id="orderReference"></strong>
+        <p>Your secure download code:</p>
+<strong id="customerDownloadCode"></strong>
+
+<p><small>
+    Save this code somewhere safe. You will need it to download your books after payment approval.
+</small></p>
+
+        <p>Transfer your payment to:</p>
+        <p>Bank: <strong id="paymentBank">OPay</strong></p>
+        <p>Account Name: <strong id="paymentName">Nelson Philip</strong></p>
+        <p>Account Number: <strong id="paymentNumber">9037141652</strong></p>
+        <p>Amount: <strong id="paymentAmount"></strong></p>
+
+        <hr>
+
+  <form id="receiptForm">
+    <h3>Upload Payment Receipt</h3>
+
+    <label for="receiptFile">
+        Select your payment receipt
+    </label>
+
+    <input
+        type="file"
+        id="receiptFile"
+        accept="image/jpeg,image/png,image/webp,application/pdf"
+        required>
+
+    <small>
+        Accepted formats: JPG, PNG, WebP and PDF.
+        Maximum size: 5MB.
+    </small>
+
+    <button
+        class="btn primary"
+        type="submit"
+        id="receiptButton">
+        Upload Receipt →
+    </button>
+</form>
+
+<p id="receiptMessage" aria-live="polite"></p>
+
+    </div>
+
+    <small>After transferring, upload your receipt for admin verification.</small>
+</div>
+    </aside>
+
+    <!-- Supabase library must load before script.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        if (window.pdfjsLib) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        }
+    </script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>
